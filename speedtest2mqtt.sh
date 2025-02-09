@@ -6,6 +6,12 @@ MQTT_OPTIONS=${MQTT_OPTIONS:-"-r"}
 MQTT_USER=${MQTT_USER:-user}
 MQTT_PASS=${MQTT_PASS:-pass}
 
+#############################################
+# When you want to debug ookla.json results
+# Just replace file variable by the following
+# file=/config/$(date -Iseconds)_ookla.json
+# So you can edit result file in /config
+#############################################
 file=~/ookla.json
 
 echo "$(date -Iseconds) starting speedtest"
