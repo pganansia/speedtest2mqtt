@@ -24,13 +24,15 @@ services:
     container_name: speedtest2mqtt
     environment:
       - MQTT_HOST=192.168.100.100
+    volumes:
+      - <path config directory on host>:/config
     restart: unless-stopped
 ```
 
 #### docker 
 
 ```
-docker run -d --env-file ./env.list pganansia/speedtest2mqtt:latest
+docker run -d --volume <path config directory on host>:/config --env-file ./env.list pganansia/speedtest2mqtt:latest
 ```
 
 with env.list
