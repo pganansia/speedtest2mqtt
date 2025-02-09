@@ -17,12 +17,10 @@ Alpine-based docker to push Ookla Speedtest results to a MQTT Server.
 #### docker-compose.yml
 
 ```
-version: "3"
-
 services:
 
   speedtest:
-    image: moafrancky/speedtest2mqtt:latest
+    image: pganansia/speedtest2mqtt:latest
     container_name: speedtest2mqtt
     environment:
       - MQTT_HOST=192.168.100.100
@@ -32,7 +30,7 @@ services:
 #### docker 
 
 ```
-docker run -d --env-file ./env.list moafrancky/speedtest2mqtt:latest
+docker run -d --env-file ./env.list pganansia/speedtest2mqtt:latest
 ```
 
 with env.list
