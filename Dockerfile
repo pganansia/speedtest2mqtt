@@ -1,12 +1,14 @@
 FROM alpine:3.16.3
 ARG TARGETARCH
 
-COPY entrypoint.sh speedtest2mqtt.sh /opt/
-COPY crontab.yml /home/foo/
+RUN mkdir /config
+
+COPY entrypoint.sh speedtest2mqtt.sh /config/
+COPY crontab.yml /config/
 
 RUN addgroup -S foo && adduser -S foo -G foo && \
-    chmod +x /opt/speedtest2mqtt.sh /opt/entrypoint.sh && \
-    chown foo:foo /home/foo/crontab.yml && \
+    chmod +x /config/speedtest2mqtt.sh /config/entrypoint.sh && \
+    chown foo:foo /config/crontab.yml && \
     apk --no-cache add bash mosquitto-clients jq python3
 
 RUN apk --no-cache add wget --virtual .build-deps && \
@@ -24,6 +26,8 @@ RUN apk --no-cache add gcc musl-dev python3-dev --virtual .build-deps && \
     . yacronenv/bin/activate && \
     pip install yacron && \
     apk del --no-cache .build-deps
+
+VOLUME /config
 
 USER foo
 ENTRYPOINT /opt/entrypoint.sh
