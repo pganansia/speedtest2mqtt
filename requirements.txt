@@ -1,5 +1,5 @@
 aiohttp==3.10.11
-aiosmtplib==2.0.0
+aiosmtplib==4.0.0
 async-timeout==4.0.2
 attrs==25.1.0
 certifi==2024.7.4
