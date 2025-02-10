@@ -21,10 +21,10 @@ jobs:
       with:
         image: "localbuild/testimage:latest"
         fail-build: false
-    - name: Upload Anchore Scan Report
-      uses: github/codeql-action/upload-sarif@v3
-      with:
-        sarif_file: "./results.sarif"
+#    - name: Upload Anchore Scan Report
+#      uses: github/codeql-action/upload-sarif@v3
+#      with:
+#        sarif_file: "./results.sarif"
   multi-arch-build:
     runs-on: ubuntu-latest
     needs: Anchore-Build-Scan
@@ -59,6 +59,6 @@ jobs:
         with:
           platforms: linux/arm/v7,linux/arm64,linux/amd64
           push: true
-          tags: moafrancky/speedtest2mqtt:${{ env.DOCKERTAG }}
+          tags: pganansia/speedtest2mqtt:${{ env.DOCKERTAG }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
