@@ -30,5 +30,5 @@ RUN apk --no-cache add gcc musl-dev python3-dev --virtual .build-deps && \
 VOLUME /config
 
 USER foo
-ENTRYPOINT /opt/entrypoint.sh
+ENTRYPOINT /config/entrypoint.sh
 
