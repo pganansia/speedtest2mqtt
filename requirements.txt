@@ -1,4 +1,4 @@
-aiohttp==3.10.11
+aiohttp==3.11.12
 aiosmtplib==4.0.0
 async-timeout==4.0.2
 attrs==25.1.0
