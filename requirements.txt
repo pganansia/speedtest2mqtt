@@ -17,7 +17,7 @@ sentry-sdk==2.20.0
 six==1.16.0
 strictyaml==1.6.1
 typing-extensions==4.4.0
-urllib3==1.26.19
+urllib3==2.3.0
 yacron==0.17.0
 yarl==1.18.3
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
