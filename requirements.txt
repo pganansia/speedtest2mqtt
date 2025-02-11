@@ -5,7 +5,7 @@ attrs==25.1.0
 certifi==2024.7.4
 chardet==5.0.0
 crontab==0.23.0
-idna==3.7
+idna==3.10
 Jinja2==3.1.5
 MarkupSafe==3.0.2
 multidict==6.1.0
