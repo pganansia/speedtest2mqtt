@@ -16,7 +16,7 @@ ruamel.yaml.clib==0.2.7
 sentry-sdk==2.20.0
 six==1.16.0
 strictyaml==1.6.1
-typing-extensions==4.4.0
+typing-extensions==4.12.2
 urllib3==2.3.0
 yacron==0.17.0
 yarl==1.18.3
