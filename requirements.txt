@@ -9,7 +9,7 @@ idna==3.10
 Jinja2==3.1.5
 MarkupSafe==3.0.2
 multidict==6.1.0
-python-dateutil==2.8.2
+python-dateutil==2.9.0.post0
 pytz==2022.6
 ruamel.yaml==0.18.10
 ruamel.yaml.clib==0.2.12
