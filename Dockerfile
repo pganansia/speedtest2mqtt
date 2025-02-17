@@ -1,13 +1,13 @@
 FROM alpine:3.21.3
 ARG TARGETARCH
 
-RUN mkdir -p /config
+WORKDIR /config
 COPY entrypoint.sh speedtest2mqtt.sh /config/
 COPY crontab.yml /config/
 
-RUN addgroup -S foo && adduser -S foo -G foo
-RUN chmod +x /config/speedtest2mqtt.sh /config/entrypoint.sh
-RUN chown foo:foo /config/crontab.yml
+#RUN addgroup -S foo && adduser -S foo -G foo
+#RUN chmod +x /config/speedtest2mqtt.sh /config/entrypoint.sh
+#RUN chown foo:foo /config/crontab.yml
 
 RUN apk --no-cache add bash mosquitto-clients jq python3
 RUN apk --no-cache add wget --virtual .build-deps && \
@@ -28,6 +28,6 @@ RUN apk --no-cache add gcc musl-dev python3-dev --virtual .build-deps && \
 
 #VOLUME /config
 
-USER foo
+#USER foo
 ENTRYPOINT /config/entrypoint.sh
 
