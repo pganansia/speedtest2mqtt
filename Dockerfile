@@ -2,7 +2,7 @@ FROM alpine:3.21.3
 ARG TARGETARCH
 
 WORKDIR /config
-COPY entrypoint.sh speedtest2mqtt.sh /config/
+COPY --chmod=755 entrypoint.sh speedtest2mqtt.sh /config/
 COPY crontab.yml /config/
 
 #RUN addgroup -S foo && adduser -S foo -G foo
