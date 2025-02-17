@@ -1,7 +1,7 @@
 FROM alpine:3.21.3
 ARG TARGETARCH
 
-RUN mkdir /config
+RUN mkdir -p /config
 COPY entrypoint.sh speedtest2mqtt.sh /config/
 COPY crontab.yml /config/
 
@@ -26,7 +26,7 @@ RUN apk --no-cache add gcc musl-dev python3-dev --virtual .build-deps && \
     pip install yacron && \
     apk del --no-cache .build-deps
 
-VOLUME /config
+#VOLUME /config
 
 USER foo
 ENTRYPOINT /config/entrypoint.sh
