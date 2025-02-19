@@ -5,10 +5,6 @@ WORKDIR /config
 COPY --chmod=755 entrypoint.sh speedtest2mqtt.sh .
 COPY crontab.yml .
 
-#RUN addgroup -S foo && adduser -S foo -G foo
-#RUN chmod +x /config/speedtest2mqtt.sh /config/entrypoint.sh
-#RUN chown foo:foo /config/crontab.yml
-
 RUN apk --no-cache add bash mosquitto-clients jq python3
 RUN apk --no-cache add wget --virtual .build-deps && \
     echo "Target Arch $TARGETARCH" && \
@@ -30,8 +26,7 @@ RUN apk --no-cache add gcc musl-dev python3-dev --virtual .build-deps && \
     pip install yacron && \
     apk del --no-cache .build-deps
 
-#VOLUME /config
+VOLUME /config
 
-#USER foo
 ENTRYPOINT /config/entrypoint.sh
 
