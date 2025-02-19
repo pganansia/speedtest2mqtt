@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 MQTT_HOST=${MQTT_HOST:-localhost}
 MQTT_ID=${MQTT_ID:-speedtest2mqtt}
 MQTT_TOPIC=${MQTT_TOPIC:-speedtest}
