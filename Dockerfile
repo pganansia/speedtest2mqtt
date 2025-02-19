@@ -26,7 +26,7 @@ RUN apk --no-cache add gcc musl-dev python3-dev --virtual .build-deps && \
     pip install yacron && \
     apk del --no-cache .build-deps
 
-VOLUME /config
+#VOLUME /config
 
 ENTRYPOINT /config/entrypoint.sh
 
