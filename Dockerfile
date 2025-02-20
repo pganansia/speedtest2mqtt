@@ -37,6 +37,6 @@ WORKDIR /config
 COPY --chmod=755 entrypoint.sh speedtest2mqtt.sh .
 COPY crontab.yml .
 
-#VOLUME /config
+VOLUME /config
 
 ENTRYPOINT ["/config/entrypoint.sh"]
