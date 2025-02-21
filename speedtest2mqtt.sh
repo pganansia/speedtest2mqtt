@@ -14,8 +14,8 @@ TIMESTAMP=$(date -Iseconds)
 # file=/config/${TIMESTAMP}_ookla.json.
 # Ainsi vous ^puvez editer le fichier.
 #############################################
-file=/config/ookla.json
-#file=/config/${TIMESTAMP}_ookla.json                                                                                      
+file=/app/config/ookla.json
+#file=/app/config/${TIMESTAMP}_ookla.json                                                                                      
 
 #############################################
 # Lancement du traitement.
