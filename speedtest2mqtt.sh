@@ -3,7 +3,7 @@
 # Test et valeur par défault des variables
 # d'environnement.
 #############################################
-FILE_RESULT=${FILE_RESULT:-"/config/ookla.json"}
+FILE_RESULT=${FILE_RESULT:-/config/ookla.json}
 MQTT_HOST=${MQTT_HOST:-localhost}
 MQTT_ID=${MQTT_ID:-speedtest2mqtt}
 MQTT_TOPIC=${MQTT_TOPIC:-speedtest}
@@ -37,7 +37,7 @@ fi
 #############################################
 # Recuperation des resultats.
 #############################################
-timestamp=$(jq -r '.timestamp'${FILE_RESULT})
+timestamp=$(jq -r '.timestamp' ${FILE_RESULT})
 jitter=$(jq -r '.ping.jitter' ${FILE_RESULT})
 ping=$(jq -r '.ping.latency' ${FILE_RESULT})
 download=$(printf %.2f\\n "$(($(jq -r '.download.bandwidth' ${FILE_RESULT}) * 8))e-6")
@@ -61,25 +61,25 @@ resulturl=$(jq -r '.result.url' ${FILE_RESULT})
 # Affichage des resultats.
 #############################################
 echo "${TIMESTAMP} Speedtest results"                                          
-echo "${TIMESTAMP} timestamp = ${timestamp}"                                   
-echo "${TIMESTAMP} jitter = ${jitter} ms"                                  
-echo "${TIMESTAMP} ping = ${ping} ms"                                          
-echo "${TIMESTAMP} download = ${download} Mbps"                                
-echo "${TIMESTAMP} upload = ${upload} Mbps"                                    
-echo "${TIMESTAMP} isp = ${isp}"                                               
+echo "${TIMESTAMP} timestamp           = ${timestamp}"                                   
+echo "${TIMESTAMP} jitter              = ${jitter} ms"                                  
+echo "${TIMESTAMP} ping                = ${ping} ms"                                          
+echo "${TIMESTAMP} download            = ${download} Mbps"                                
+echo "${TIMESTAMP} upload              = ${upload} Mbps"                                    
+echo "${TIMESTAMP} isp                 = ${isp}"                                               
 echo "${TIMESTAMP} interfaceinternalip = ${interfaceinternalip}"           
-echo "${TIMESTAMP} interfacename = ${interfacename}"
-echo "${TIMESTAMP} interfacemacaddr = ${interfacemacaddr}"                     
-echo "${TIMESTAMP} interfaceisvpn = ${interfaceisvpn}"                         
+echo "${TIMESTAMP} interfacename       = ${interfacename}"
+echo "${TIMESTAMP} interfacemacaddr    = ${interfacemacaddr}"                     
+echo "${TIMESTAMP} interfaceisvpn      = ${interfaceisvpn}"                         
 echo "${TIMESTAMP} interfaceexternalip = ${interfaceexternalip}"           
-echo "${TIMESTAMP} servername = ${servername}"                                 
-echo "${TIMESTAMP} serverlocation = ${serverlocation}"                         
-echo "${TIMESTAMP} servercountry = ${servercountry}"                           
-echo "${TIMESTAMP} serverhost = ${serverhost}"                                 
-echo "${TIMESTAMP} serverport = ${serverport}"                             
-echo "${TIMESTAMP} serverip = ${serverip}"
-echo "${TIMESTAMP} resultid = ${resultid}"
-echo "${TIMESTAMP} resulturl = ${resulturl}"
+echo "${TIMESTAMP} servername          = ${servername}"                                 
+echo "${TIMESTAMP} serverlocation      = ${serverlocation}"                         
+echo "${TIMESTAMP} servercountry       = ${servercountry}"                           
+echo "${TIMESTAMP} serverhost          = ${serverhost}"                                 
+echo "${TIMESTAMP} serverport          = ${serverport}"                             
+echo "${TIMESTAMP} serverip            = ${serverip}"
+echo "${TIMESTAMP} resultid            = ${resultid}"
+echo "${TIMESTAMP} resulturl           = ${resulturl}"
 echo "${TIMESTAMP} sending results to ${MQTT_HOST} as clientID ${MQTT_ID} with options ${MQTT_OPTIONS} using user ${MQTT_USER}"
 
 #############################################                    
