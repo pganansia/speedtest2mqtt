@@ -16,7 +16,7 @@ TIMESTAMP=$(date -Iseconds)
 # Lancement du traitement.
 #############################################
 echo "${TIMESTAMP} Starting speedtest"
-echo "${TIMESTAMP} Result file: ${file}"
+echo "${TIMESTAMP} Result file: ${FILE_RESULT}"
 
 #############################################
 # Lancement de speedtest.
