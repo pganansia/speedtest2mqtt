@@ -19,4 +19,3 @@ declare | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /config/co
 sed -i "/schedule/c\    schedule: \"${CRON}\"" /config/crontab.yml
 echo "starting cron (${CRON})"
 /yacronenv/bin/yacron -c /config/crontab.yml
-echo "speedtest2mqtt.sh has been planned "
