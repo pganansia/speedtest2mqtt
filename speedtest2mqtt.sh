@@ -28,8 +28,7 @@ speedtest --accept-license --accept-gdpr -f json-pretty > ${FILE_RESULT}
 #############################################
 nberror=$(jq -r '.error' ${FILE_RESULT} | wc -w)
 echo "${TIMESTAMP} Erreur de traitement nb mots: ${nberror}"
-if [ ${nberror} -gt 1 ];
-then
+if [ ${nberror} -gt 1 ]; then
     echo "${TIMESTAMP} error in results";
     exit;
 fi
