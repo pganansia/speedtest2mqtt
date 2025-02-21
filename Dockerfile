@@ -14,8 +14,9 @@ LABEL org.opencontainers.image.version=${VERSION}
 
 RUN mkdir -p /app
 RUN mkdir -p /app/config
-COPY --chmod=755 entrypoint.sh speedtest2mqtt.sh /app/config
+COPY --chmod=755 speedtest2mqtt.sh /app/config
 COPY crontab.yml /app/config
+COPY --chmod=755 entrypoint.sh /
 
 RUN apk --no-cache add bash mosquitto-clients jq python3
 RUN apk --no-cache add wget --virtual .build-deps && \
@@ -35,7 +36,6 @@ RUN apk --no-cache add gcc musl-dev python3-dev --virtual .build-deps && \
     pip install yacron && \
     apk del --no-cache .build-deps
 
-WORKDIR /app/config
-VOLUME /config
+VOLUME ["/config"]
 
-ENTRYPOINT ["/app/config/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
