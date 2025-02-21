@@ -1,4 +1,9 @@
 #!/bin/bash
+#############################################
+# Test et valeur par défault des variables
+# d'environnement.
+#############################################
+FILE_RESULT=${FILE_RESULT:-"/config/ookla.json"}
 MQTT_HOST=${MQTT_HOST:-localhost}
 MQTT_ID=${MQTT_ID:-speedtest2mqtt}
 MQTT_TOPIC=${MQTT_TOPIC:-speedtest}
@@ -6,16 +11,6 @@ MQTT_OPTIONS=${MQTT_OPTIONS:-"-r"}
 MQTT_USER=${MQTT_USER:-user}
 MQTT_PASS=${MQTT_PASS:-pass}
 TIMESTAMP=$(date -Iseconds)
-
-#############################################
-# Si vous souhaitez debugger le fichier
-# ookla.json, il suffit de remplacer la
-# variable file par
-# file=/config/${TIMESTAMP}_ookla.json.
-# Ainsi vous ^puvez editer le fichier.
-#############################################
-file=/app/config/ookla.json
-#file=/app/config/${TIMESTAMP}_ookla.json                                                                                      
 
 #############################################
 # Lancement du traitement.
@@ -26,12 +21,12 @@ echo "${TIMESTAMP} Result file: ${file}"
 #############################################
 # Lancement de speedtest.
 #############################################                                                                                      
-speedtest --accept-license --accept-gdpr -f json-pretty > ${file}
+speedtest --accept-license --accept-gdpr -f json-pretty > ${FILE_RESULT}
 
 #############################################
 # Test d'un resultat en erreur.
 #############################################
-nberror=$(jq -r '.error' ${file} | wc -w)
+nberror=$(jq -r '.error' ${FILE_RESULT} | wc -w)
 echo "${TIMESTAMP} Erreur de traitement nb mots: ${nberror}"
 if [ ${nberror} -gt 1 ];
 then
@@ -42,25 +37,25 @@ fi
 #############################################
 # Recuperation des resultats.
 #############################################
-timestamp=$(jq -r '.timestamp' ${file})
-jitter=$(jq -r '.ping.jitter' ${file})
-ping=$(jq -r '.ping.latency' ${file})
-download=$(printf %.2f\\n "$(($(jq -r '.download.bandwidth' ${file}) * 8))e-6")
-upload=$(printf %.2f\\n "$(($(jq -r '.upload.bandwidth' ${file}) * 8))e-6")
-isp=$(jq -r '.isp' ${file})                                                    
-interfaceinternalip=$(jq -r '.interface.internalIp' ${file})                   
-interfacename=$(jq -r '.interface.name' ${file})                               
-interfacemacaddr=$(jq -r '.interface.macAddr' ${file})                         
-interfaceisvpn=$(jq -r '.interface.isVpn' ${file})                             
-interfaceexternalip=$(jq -r '.interface.externalIp' ${file})                   
-servername=$(jq -r '.server.name' ${file})                                     
-servercountry=$(jq -r '.server.country' ${file})                               
-serverlocation=$(jq -r '.server.location' ${file})                             
-serverhost=$(jq -r '.server.host' ${file})                                     
-serverport=$(jq -r '.server.port' ${file})                                     
-serverip=$(jq -r '.server.ip' ${file})                                         
-resultid=$(jq -r '.result.id' ${file})                                         
-resulturl=$(jq -r '.result.url' ${file})                                       
+timestamp=$(jq -r '.timestamp'${FILE_RESULT})
+jitter=$(jq -r '.ping.jitter' ${FILE_RESULT})
+ping=$(jq -r '.ping.latency' ${FILE_RESULT})
+download=$(printf %.2f\\n "$(($(jq -r '.download.bandwidth' ${FILE_RESULT}) * 8))e-6")
+upload=$(printf %.2f\\n "$(($(jq -r '.upload.bandwidth' ${FILE_RESULT}) * 8))e-6")
+isp=$(jq -r '.isp' ${FILE_RESULT})                                                    
+interfaceinternalip=$(jq -r '.interface.internalIp' ${FILE_RESULT})                   
+interfacename=$(jq -r '.interface.name' ${FILE_RESULT})                               
+interfacemacaddr=$(jq -r '.interface.macAddr' ${FILE_RESULT})                         
+interfaceisvpn=$(jq -r '.interface.isVpn' ${FILE_RESULT})                             
+interfaceexternalip=$(jq -r '.interface.externalIp' ${FILE_RESULT})                   
+servername=$(jq -r '.server.name' ${FILE_RESULT})                                     
+servercountry=$(jq -r '.server.country' ${FILE_RESULT})                               
+serverlocation=$(jq -r '.server.location' ${FILE_RESULT})                             
+serverhost=$(jq -r '.server.host' ${FILE_RESULT})                                     
+serverport=$(jq -r '.server.port' ${FILE_RESULT})                                     
+serverip=$(jq -r '.server.ip' ${FILE_RESULT})                                         
+resultid=$(jq -r '.result.id' ${FILE_RESULT})                                         
+resulturl=$(jq -r '.result.url' ${FILE_RESULT})                                       
                                                                                
 #############################################
 # Affichage des resultats.
