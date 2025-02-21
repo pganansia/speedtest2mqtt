@@ -3,7 +3,7 @@ jobs:
     command: /config/speedtest2mqtt.sh
     shell: /bin/bash
     schedule: "*/5 * * * *"
-    env_file: /var/tmp/container.env
+    env_file: /config/container.env
     captureStderr: false
     captureStdout: true
     concurrencyPolicy: Forbid
