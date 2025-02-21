@@ -3,7 +3,7 @@ CRON=${CRON:-0 0,6,12,18 * * *}
 echo "speedtest2mqtt has been started "
 
 declare | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /var/tmp/container.env
-sed -i "/schedule/c\    schedule: \"${CRON}\"" /config/crontab.yml
+sed -i "/schedule/c\    schedule: \"${CRON}\"" /app/config/crontab.yml
 
 echo "starting cron (${CRON})"
-/yacronenv/bin/yacron -c /config/crontab.yml
+/yacronenv/bin/yacron -c /app/config/crontab.yml
