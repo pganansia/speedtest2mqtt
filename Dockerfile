@@ -17,7 +17,6 @@ COPY --chmod=755 entrypoint.sh speedtest2mqtt.sh .
 COPY crontab.yml .
 
 WORKDIR /
-
 RUN apk --no-cache add bash mosquitto-clients jq python3
 RUN apk --no-cache add wget --virtual .build-deps && \
     echo "Target Arch $TARGETARCH" && \
@@ -30,7 +29,6 @@ RUN apk --no-cache add wget --virtual .build-deps && \
     mv /var/tmp/speedtest /usr/local/bin && \
     rm /var/tmp/speedtest.tar.gz && \
     apk del --no-cache .build-deps
-
 RUN apk --no-cache add gcc musl-dev python3-dev --virtual .build-deps && \
     python3 -m venv yacronenv && \
     . yacronenv/bin/activate && \
