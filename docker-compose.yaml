@@ -14,5 +14,5 @@ services:
       - MQTT_USER=user_mqqtt
       - MQTT_PASS=password_mqtt
     volumes:
-      - /<mon_repertoire_dans_le_serveur>:/config
+      - <path config directory on host>:/config
     restart: unless-stopped
