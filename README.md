@@ -4,13 +4,14 @@ Alpine-based docker to push Ookla Speedtest results to a MQTT Server.
 
 ## Environment Variables
 
-    CRON (Default '0 0,6,12,18 * * *' -> run speedtest 4 times a day )
+    CRON (Default '*/5 * * * *' -> run speedtest every 5 minutes )
+    FILE_RESULT (Default '/config/ookla.json')
     MQTT_HOST (Default 'localhost')
     MQTT_ID (Default 'speedtest2mqtt')
     MQTT_TOPIC (Default 'speedtest')
     MQTT_OPTIONS (Default '-r')
-    MQTT_USER (Default 'user')
-    MQTT_PASS (Default 'pass')
+    MQTT_USER (Default 'user_mqtt')
+    MQTT_PASS (Default 'password_mqtt')
 
 ## Examples
 
@@ -18,12 +19,18 @@ Alpine-based docker to push Ookla Speedtest results to a MQTT Server.
 
 ```
 services:
-
   speedtest:
     image: pganansia/speedtest2mqtt:latest
     container_name: speedtest2mqtt
     environment:
-      - MQTT_HOST=192.168.100.100
+      - CRON=*/5 * * * *
+      - FILE_RESULT=/config/ookla.json
+      - MQTT_HOST=localhost
+      - MQTT_ID=speedtest2mqtt
+      - MQTT_TOPIC=speedtest
+      - MQTT_OPTIONS=-r
+      - MQTT_USER=user_mqqtt
+      - MQTT_PASS=password_mqtt
     volumes:
       - <path config directory on host>:/config
     restart: unless-stopped
@@ -38,13 +45,14 @@ docker run -d --volume <path config directory on host>:/config --env-file ./env.
 with env.list
 
 ```
+CRON=*/5 * * * *
+FILE_RESULT=/config/ookla.json
 MQTT_HOST=192.168.100.100
 MQTT_ID=speedtest2mqtt
 MQTT_TOPIC=speedtest
 MQTT_OPTIONS=-r
-MQTT_USER=user
-MQTT_PASS=changeme
-CRON=0 * * * *
+MQTT_USER=user_mqtt
+MQTT_PASS=password_mqtt
 ```
 
 ## Note
