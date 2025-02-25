@@ -23,7 +23,7 @@ jobs:
 #        image: "localbuild/testimage:latest"
 #        fail-build: false
     - name: Run Anchore Scan
-      uses: anchore/scan-action@v2.0.3
+      uses: anchore/scan-action@v6.1.0
       with:
         image: localbuild/testimage:latest
         fail-build: false
