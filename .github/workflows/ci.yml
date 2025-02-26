@@ -31,7 +31,7 @@ jobs:
         vex: false
         cache-db: false
     - name: Upload Anchore Scan Report
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@v3.28.9
       with:
          sarif_file: ${{ steps.scan.outputs.sarif }}
   multi-arch-build:
