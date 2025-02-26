@@ -9,6 +9,16 @@ on:
     - cron:  '0 0 * * SUN'
 
 jobs:
+  Echo:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Echo variables
+      run: echo "${{ env.BRANCH_NAME }}"
+    - name: Echo variables
+      run: echo "${GITHUB_REF}"
+    - name: Debug docker tag
+      run: echo ${{ env.DOCKERTAG }}
+
   Anchore-Build-Scan:
     runs-on: ubuntu-latest
     steps:
