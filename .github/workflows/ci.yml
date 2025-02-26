@@ -23,7 +23,7 @@ jobs:
         image: localbuild/testimage:latest
         fail-build: false
         output-format: sarif
-        output-file: '.github/results/results.sarif'
+        output-file: 'results/results.sarif'
         severity-cutoff: medium
         only-fixed: false
         add-cpes-if-none: false
