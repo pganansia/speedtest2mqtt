@@ -46,7 +46,6 @@ jobs:
       - name: Cat GITHUB_ENV
         shell: bash
         run: cat $GITHUB_ENV
-
   Anchore-Build-Scan:
     runs-on: ubuntu-latest
     steps:
