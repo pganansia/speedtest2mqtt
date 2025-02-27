@@ -45,7 +45,7 @@ jobs:
         run: echo $(echo ${{ env.DOCKERTAG }})
       - name: Cat GITHUB_ENV
         shell: bash
-        run: echo $(cat ${GITHUB_ENV}")
+        run: echo $(cat $GITHUB_ENV)
   Anchore-Build-Scan:
     runs-on: ubuntu-latest
     steps:
