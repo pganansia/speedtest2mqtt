@@ -9,44 +9,7 @@ on:
     - cron:  '0 0 * * SUN'
 
 jobs:
-  Echo:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3.3.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5.7.0
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Set DOCKERTAG
-        if: ${{ env.BRANCH_NAME != 'main' }}
-        shell: bash
-        run: echo "DOCKERTAG=$(echo "${{ env.BRANCH_NAME }}" | sed 's/refs-tags-v//')" >> $GITHUB_ENV
-      - name: Set BRANCH_NAME
-        shell: bash
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
-      - name: Echo GITHUB_ENV
-        shell: bash
-        run: echo $GITHUB_ENV
-      - name: Echo BRANCH_NAME
-        shell: bash
-        run: echo ${{ env.BRANCH_NAME }}
-      - name: Echo GITHUB_REF
-        shell: bash
-        run: echo $GITHUB_REF
-      - name: Echo DOCKERTAG
-        shell: bash
-        run: echo $(echo ${{ env.DOCKERTAG }})
-      - name: Cat GITHUB_ENV
-        shell: bash
-        run: echo $(cat ${GITHUB_ENV})
-  Anchore-Build-Scan:
+  anchore-build-scan:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the code
