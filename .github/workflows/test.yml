@@ -42,7 +42,7 @@ jobs:
         run: echo $GITHUB_REF
       - name: Echo DOCKERTAG
         shell: bash
-        run: echo $(echo ${{ env.DOCKERTAG }})
+        run: echo $DOCKERTAG
       - name: Cat GITHUB_ENV
         shell: bash
         run: echo $(cat ${GITHUB_ENV})
