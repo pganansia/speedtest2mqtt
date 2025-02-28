@@ -9,28 +9,28 @@ on:
     - cron:  '0 0 * * SUN'
 
 jobs:
-#  codeql-analyze:
-#    runs-on: ubuntu-latest
-#    name: CodeQL analyze
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        language: ['javascript-typescript', 'yaml']
-#    steps:
-#      - name: Checkout the code
-#        uses: actions/checkout@v4.2.2
-#      - name: Initialize CodeQL
-#        uses: github/codeql-action/init@v3.28.10
-#        with:
-#          languages : ${{ matrix.language }}
-#      - name: Setup proxy for registries 
-#        uses: github/codeql-action/start-proxy@v3.28.10
-#      - name: Perform CodeQL analysis 
-#        uses: github/codeql-action/analyze@v3.28.10
-#      - name: Upload Anchore Scan Report
-#        uses: github/codeql-action/upload-sarif@v3.28.10
-#        with:
-#          sarif_file: '/home/runner/work/speedtest2mqtt/results/actions.sarif'
+  codeql-analyze:
+    runs-on: ubuntu-latest
+    name: CodeQL analyze
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript-typescript', 'yaml']
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4.2.2
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3.28.10
+        with:
+          languages : ${{ matrix.language }}
+      - name: Setup proxy for registries 
+        uses: github/codeql-action/start-proxy@v3.28.10
+      - name: Perform CodeQL analysis 
+        uses: github/codeql-action/analyze@v3.28.10
+      - name: Upload Anchore Scan Report
+        uses: github/codeql-action/upload-sarif@v3.28.10
+        with:
+          sarif_file: '/home/runner/work/speedtest2mqtt/results/actions.sarif'
   anchore-build-scan:
     runs-on: ubuntu-latest
     steps:
