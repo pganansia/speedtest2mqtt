@@ -1,15 +1,14 @@
-name: Test variables
+name: CodeQL analysis
 
 on:
   push:
-    branches: main
-    tags:
-      - 'v*'
+    branches: ["main"]
+    tags: ["v*.*.*"]
   schedule:
     - cron:  '0 0 * * SUN'
 
 jobs:
-  Echo:
+  echo:
     runs-on: ubuntu-latest
     steps:
       - name: Log into registry ${{ env.REGISTRY }}
@@ -46,3 +45,27 @@ jobs:
       - name: Cat GITHUB_ENV
         shell: bash
         run: echo $(cat ${GITHUB_ENV})
+  codeql-analyze:
+    runs-on: ubuntu-latest
+    name: CodeQL analyze
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript-typescript', 'yaml']
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4.2.2
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3.28.10
+        with:
+          languages : ${{ matrix.language }}
+      - name: Setup proxy for registries 
+        uses: github/codeql-action/start-proxy@v3.28.10
+      - name: Perform CodeQL analysis 
+        uses: github/codeql-action/analyze@v3.28.10
+        with:
+          output: "./results"
+      - name: Upload Anchore Scan Report
+        uses: github/codeql-action/upload-sarif@v3.28.10
+        with:
+          sarif_file: '/home/runner/work/speedtest2mqtt/results/actions.sarif'
