@@ -64,7 +64,7 @@ jobs:
       - name: Perform CodeQL analysis 
         uses: github/codeql-action/analyze@v3.28.10
         with:
-          output: "./results"
+          output: "./speedtest2mqtt/results"
       - name: Upload Anchore Scan Report
         uses: github/codeql-action/upload-sarif@v3.28.10
         with:
