@@ -31,6 +31,9 @@ jobs:
         cache-db: false
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3.28.10
+      with:
+        languages : ${{ matrix.language }}
+        build-mode: none
     - name: Setup proxy for registries 
       uses: github/codeql-action/start-proxy@v3.28.10
     - name: Perform CodeQL analysis 
