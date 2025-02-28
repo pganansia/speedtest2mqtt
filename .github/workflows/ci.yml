@@ -15,14 +15,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript-typescript', 'yaml', 'python']
+        language: ['javascript-typescript', 'yaml']
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4.2.2
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3.28.10
         with:
-          db-location: '${{ github.runner_temp }}/speedtest2mqtt'
           languages : ${{ matrix.language }}
       - name: Setup proxy for registries 
         uses: github/codeql-action/start-proxy@v3.28.10
