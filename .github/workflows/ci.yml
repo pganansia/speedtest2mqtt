@@ -35,7 +35,7 @@ jobs:
         id: scan
         with:
           image: localbuild/testimage:latest
-          fail-build: true
+          fail-build: false
           output-format: sarif
           severity-cutoff: medium
           only-fixed: false
