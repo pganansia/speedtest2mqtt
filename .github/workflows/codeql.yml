@@ -10,6 +10,7 @@ on:
 jobs:
   echo:
     runs-on: ubuntu-latest
+    name: Echo test
     steps:
       - name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
@@ -47,6 +48,21 @@ jobs:
         run: echo $(cat ${GITHUB_ENV})
   codeql-analyze:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      attestations: write
+      checks: write
+      contents: write
+      deployments: write
+      id-token: write
+      issues: write
+      discussions: write
+      packages: write
+      pages: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
     name: CodeQL analyze
     strategy:
       fail-fast: false
