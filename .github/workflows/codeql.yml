@@ -81,8 +81,8 @@ jobs:
     name: CodeQL analyze
     strategy:
       fail-fast: false
-      matrix:
-        language: ['actions', 'yaml']
+#      matrix:
+#        language: ['actions', 'yaml']
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4.2.2
