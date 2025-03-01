@@ -51,7 +51,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript-typescript', 'yaml']
+        language: ['actions', 'yaml']
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4.2.2
