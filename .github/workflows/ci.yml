@@ -44,10 +44,10 @@ jobs:
           by-cve: false
           vex: false
           cache-db: false
-      - name: Upload Anchore Scan Report
-        uses: github/codeql-action/upload-sarif@v3.28.10
-        with:
-          sarif_file: ${{ steps.scan.outputs.sarif }}
+#      - name: Upload Anchore Scan Report
+#        uses: github/codeql-action/upload-sarif@v3.28.10
+#        with:
+#          sarif_file: ${{ steps.scan.outputs.sarif }}
   multi-arch-build:
     runs-on: ubuntu-latest
     needs: anchore-build-scan

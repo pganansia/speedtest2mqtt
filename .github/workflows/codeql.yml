@@ -81,15 +81,12 @@ jobs:
     name: CodeQL analyze
     strategy:
       fail-fast: false
-#      matrix:
-#        language: ['actions', 'yaml']
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4.2.2
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3.28.10
         with:
-#          languages : ${{ matrix.language }}
           languages : actions
       - name: Setup proxy for registries 
         uses: github/codeql-action/start-proxy@v3.28.10
@@ -97,17 +94,6 @@ jobs:
         uses: github/codeql-action/analyze@v3.28.10
         with:
           output: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results"
-#      - name: Initialize CodeQL
-#        uses: github/codeql-action/init@v3.28.10
-#        with:
-#          languages : ${{ matrix.language }}
-#          languages : yaml
-#      - name: Setup proxy for registries 
-#        uses: github/codeql-action/start-proxy@v3.28.10
-#      - name: Perform CodeQL analysis 
-#        uses: github/codeql-action/analyze@v3.28.10
-#        with:
-#          output: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results"
       - name: Upload Anchore Scan Report
         uses: github/codeql-action/upload-sarif@v3.28.10
         with:
