@@ -37,7 +37,7 @@ jobs:
           image: localbuild/testimage:latest
           fail-build: false
           output-format: sarif
-          output-file: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/resultsactions.sarif"
+          output-file: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results/actions.sarif"
           severity-cutoff: medium
           only-fixed: false
           add-cpes-if-none: false
