@@ -1,9 +1,9 @@
 name: CodeQL analysis
 
 on:
-  push:
-    branches: ["main"]
-    tags: ["v*.*.*"]
+#  push:
+#    branches: ["main"]
+#    tags: ["v*.*.*"]
   schedule:
     - cron:  '0 0 * * SUN'
 
