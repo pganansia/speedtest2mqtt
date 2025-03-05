@@ -31,15 +31,14 @@ echo "${TIMESTAMP} Speedtest results"
 #############################################
 # Test d'un resultat en erreur.
 #############################################
-nberror=$(jq -r '.error' ${FILE_RESULT} | wc -w)
-echo "${TIMESTAMP} Erreur de traitement nb mots: ${nberror}"
-if [ ${nberror} -gt 1 ]; then
-    echo "${TIMESTAMP} Results with errors"
-    error=$(jq -r '.error' ${FILE_RESULT})
-    echo "${TIMESTAMP} Speedtest results"
-    echo "${TIMESTAMP} error               = ${error}"
+strerror=$(jq -r '.error' ${FILE_RESULT})
+if [[ ${strerror} != "null" ]]; then
+    echo "${TIMESTAMP} Process error       = ${strerror}"
     echo "${TIMESTAMP} Ending speedtest"
     exit 1
+else
+    strerror="No error"
+    echo "${TIMESTAMP} Process error       = ${strerror}"
 fi
 
 #############################################
