@@ -1,6 +1,5 @@
 FROM alpine:3.21.3
 ARG TARGETARCH
-
 ARG DATE
 ARG VERSION
 LABEL org.opencontainers.image.authors="Pierre Ganansia"
@@ -17,6 +16,9 @@ RUN mkdir -p /app/config
 COPY --chmod=755 speedtest2mqtt.sh /app/config
 COPY crontab.yml /app/config
 COPY --chmod=755 entrypoint.sh /
+
+RUN apk add --no-cache tzdata
+ENV TZ=Europe/Paris
 
 RUN apk --no-cache add bash mosquitto-clients jq python3
 RUN apk --no-cache add wget --virtual .build-deps && \
