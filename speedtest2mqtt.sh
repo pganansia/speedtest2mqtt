@@ -38,6 +38,7 @@ if [ ${nberror} -gt 1 ]; then
     error=$(jq -r '.error' ${FILE_RESULT})
     echo "${TIMESTAMP} Speedtest results"
     echo "${TIMESTAMP} error               = ${error}"
+    echo "${TIMESTAMP} Ending speedtest"
     exit 1
 fi
 
