@@ -27,7 +27,7 @@ jobs:
       statuses: write
     steps:
       - name: Check out the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag localbuild/testimage:latest --build-arg TARGETARCH=amd64
       - name: Run the Anchore Grype scan action
