@@ -1,11 +1,25 @@
 name: CodeQL analysis
 
 on:
-#  push:
-#    branches: ["main"]
-#    tags: ["v*.*.*"]
-  schedule:
-    - cron:  '0 0 * * SUN'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Test Anchore Grype Vulnerability scan'
+        required: false
+        type: boolean
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
 
 jobs:
   echo:
@@ -61,6 +75,7 @@ jobs:
       - name: Cat GITHUB_ENV
         shell: bash
         run: echo $(cat ${GITHUB_ENV})
+
   codeql-analyze:
     runs-on: ubuntu-latest
     permissions:
@@ -92,6 +107,7 @@ jobs:
         uses: github/codeql-action/start-proxy@v3.28.10
       - name: Perform CodeQL analysis 
         uses: github/codeql-action/analyze@v3.28.10
+        id: scan
         with:
           output: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results"
       - name: Upload Anchore Scan Report
