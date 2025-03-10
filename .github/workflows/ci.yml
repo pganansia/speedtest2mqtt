@@ -37,30 +37,12 @@ jobs:
           image: "localbuild/testimage:latest"
           fail-build: false
           output-format: sarif
-          severity-cutoff: critical
+          severity-cutoff: medium
           cache-db: true
       - name: Upload vulnerability report
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
-#      - name: Checkout the code
-#        uses: actions/checkout@v4.2.2
-#      - name: Build the Docker image
-#        run: docker build . --file Dockerfile --tag localbuild/testimage:latest --build-arg TARGETARCH=amd64
-#      - name: Run Anchore Scan
-#        uses: anchore/scan-action@v6.1.0
-#        id: scan
-#        with:
-#          image: localbuild/testimage:latest
-#          fail-build: false
-#          output-format: sarif
-#          output-file: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results/actions.sarif"
-#          severity-cutoff: medium
-#          only-fixed: false
-#          add-cpes-if-none: false
-#          by-cve: false
-#          vex: false
-#          cache-db: false
 #      - name: Upload Anchore Scan Report
 #        uses: github/codeql-action/upload-sarif@v3.28.10
 #        with:
