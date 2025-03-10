@@ -25,20 +25,9 @@ jobs:
   echo:
     runs-on: ubuntu-latest
     permissions:
-        actions: write
-        attestations: write
-        checks: write
-        contents: write
+        actions: read
+        contents: read
         deployments: write
-        id-token: write
-        issues: write
-        discussions: write
-        packages: write
-        pages: write
-        pull-requests: write
-        repository-projects: write
-        security-events: write
-        statuses: write
     name: Echo test
     steps:
       - name: Log into registry ${{ env.REGISTRY }}
@@ -110,7 +99,7 @@ jobs:
         id: scan
         with:
           output: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results"
-      - name: Upload Anchore Scan Report
-        uses: github/codeql-action/upload-sarif@v3.28.10
-        with:
-          sarif_file: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results/actions.sarif"
+#      - name: Upload Anchore Scan Report
+#        uses: github/codeql-action/upload-sarif@v3.28.10
+#        with:
+#          sarif_file: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results/actions.sarif"
