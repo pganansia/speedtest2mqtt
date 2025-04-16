@@ -23,6 +23,7 @@ jobs:
       contents: read
       packages: write
       id-token: write
+      security-events: write
     steps:
       # Check out du package
       - name: Checkout repository
