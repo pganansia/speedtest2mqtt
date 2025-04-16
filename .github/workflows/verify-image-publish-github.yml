@@ -1,11 +1,7 @@
-name: Image Docker publish into Github
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+name: Verify, Build and Push Image to Github
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '21 11 * * *'
   push:
@@ -26,10 +22,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
       id-token: write
-
     steps:
       # Check out du package
       - name: Checkout repository
@@ -37,7 +30,6 @@ jobs:
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
       - name: Install cosign
-#        if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3.8.1
         with:
           cosign-release: 'v2.4.3'
