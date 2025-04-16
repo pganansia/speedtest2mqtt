@@ -23,7 +23,7 @@ jobs:
 #        pages: write
 #        pull-requests: write
 #        repository-projects: write
-#        security-events: write
+        security-events: write
 #        statuses: write
     steps:
       - name: Check out the code
