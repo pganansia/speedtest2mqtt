@@ -1,5 +1,5 @@
-name: Automerge
-
+name: Automerge Pull Request
+²
 on:
   workflow_dispatch:
     inputs:
