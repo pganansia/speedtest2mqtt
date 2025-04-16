@@ -49,10 +49,6 @@ jobs:
       contents: read # for actions/checkout to fetch code
       id-token: write
       packages: write
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-#      contents: read
-#      id-token: write
-#      security-events: write
     steps:
       # Check out du package
       - name: Checkout repository
