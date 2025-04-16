@@ -18,13 +18,13 @@ jobs:
         deployments: write
         id-token: write
         issues: write
-        discussions: write
+#        discussions: write
         packages: write
-        pages: write
-        pull-requests: write
-        repository-projects: write
-        security-events: write
-        statuses: write
+#        pages: write
+#        pull-requests: write
+#        repository-projects: write
+#        security-events: write
+#        statuses: write
     steps:
       - name: Check out the code
         uses: actions/checkout@v4.2.2
