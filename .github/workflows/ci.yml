@@ -1,4 +1,4 @@
-name: Verify, Build and Push Image to Docker
+name: Old Verify, Build and Push Image to Docker
 
 on:
   workflow_dispatch:
