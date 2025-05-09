@@ -35,6 +35,8 @@ jobs:
   multi-arch-build:
     runs-on: ubuntu-latest
     needs: anchore-build-scan
+    permissions:
+      contents: read
     steps:
       - name: Get branch name
         shell: bash
