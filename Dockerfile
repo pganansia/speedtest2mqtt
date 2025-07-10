@@ -2,9 +2,10 @@ FROM alpine:3.22.0
 ARG TARGETARCH
 ARG DATE
 ARG VERSION
+ENV TZ=Europe/Paris
 LABEL org.opencontainers.image.authors="Pierre Ganansia"
 LABEL org.opencontainers.image.title="Speedtest2mqtt"
-LABEL org.opencontainers.image.description="Speedtest trough MQTT for Home Assistant. Thanks to maofrancky"
+LABEL org.opencontainers.image.description="Speedtest trough MQTT for Home Assistant. Thanks to moafrancky"
 LABEL org.opencontainers.image.url="https://github.com/pganansia/speedtest2mqtt"
 LABEL org.opencontainers.image.source="https://github.com/pganansia/speedtest2mqtt"
 LABEL org.opencontainers.image.licenses="GPL-3.0"
@@ -17,14 +18,13 @@ COPY --chmod=755 speedtest2mqtt.sh /app/config
 COPY crontab.yml /app/config
 COPY --chmod=755 entrypoint.sh /
 
-RUN apk add --no-cache tzdata
-ENV TZ=Europe/Paris
-
 # Copy requirements file
 COPY requirements.txt .
 
-# Install dependencies based on environment
+# Install dependencies 
 RUN pip install --no-cache-dir -r requirements.txt;
+
+RUN apk add --no-cache tzdata
 
 RUN apk --no-cache add bash mosquitto-clients jq python3
 RUN apk --no-cache add wget --virtual .build-deps && \
