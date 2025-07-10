@@ -20,6 +20,12 @@ COPY --chmod=755 entrypoint.sh /
 RUN apk add --no-cache tzdata
 ENV TZ=Europe/Paris
 
+# Copy requirements file
+COPY requirements.txt .
+
+# Install dependencies based on environment
+RUN pip install --no-cache-dir -r requirements.txt;
+
 RUN apk --no-cache add bash mosquitto-clients jq python3
 RUN apk --no-cache add wget --virtual .build-deps && \
     echo "Target Arch $TARGETARCH" && \
