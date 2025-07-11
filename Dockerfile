@@ -18,15 +18,22 @@ COPY --chmod=755 speedtest2mqtt.sh /app/config
 COPY crontab.yml /app/config
 COPY --chmod=755 entrypoint.sh /
 
-# Copy requirements file
-COPY requirements.txt .
 
-# Install dependencies 
-#RUN pip install --no-cache-dir -r requirements.txt;
-
+# Installation de la gestion fuseau horaire 
 RUN apk add --no-cache tzdata
 
+# Installation des outils necessaires 
 RUN apk --no-cache add bash mosquitto-clients jq python3
+# Installation des dependances 
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt;
+# Installation de l'automate d'execution 
+RUN apk --no-cache add gcc musl-dev python3-dev --virtual .build-deps && \
+    python3 -m venv yacronenv && \
+    . yacronenv/bin/activate && \
+    pip install yacron && \
+    apk del --no-cache .build-deps
+# Installation de Speedtest 
 RUN apk --no-cache add wget --virtual .build-deps && \
     echo "Target Arch $TARGETARCH" && \
     if test "$TARGETARCH" = '386'; then wget https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-i386.tgz -O /var/tmp/speedtest.tar.gz; fi && \
@@ -37,11 +44,6 @@ RUN apk --no-cache add wget --virtual .build-deps && \
     tar xf /var/tmp/speedtest.tar.gz -C /var/tmp && \
     mv /var/tmp/speedtest /usr/local/bin && \
     rm /var/tmp/speedtest.tar.gz && \
-    apk del --no-cache .build-deps
-RUN apk --no-cache add gcc musl-dev python3-dev --virtual .build-deps && \
-    python3 -m venv yacronenv && \
-    . yacronenv/bin/activate && \
-    pip install yacron && \
     apk del --no-cache .build-deps
 
 VOLUME ["/config"]
