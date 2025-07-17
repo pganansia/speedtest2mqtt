@@ -28,7 +28,7 @@ RUN apk --no-cache add python3
 # Installation d'un environnement virtuel 
 RUN apk --no-cache add gcc musl-dev python3-dev
 RUN python3 -m venv speedtest2mqtt && \
-    . speedtest2mqtt/bin/activate && \
+    . speedtest2mqtt/bin/activate
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt;
 RUN pip install yacron
