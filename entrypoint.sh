@@ -18,4 +18,4 @@ CRON=${CRON:-0 0,6,12,18 * * *}
 declare | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /config/container.env
 sed -i "/schedule/c\    schedule: \"${CRON}\"" /config/crontab.yml
 echo "starting cron (${CRON})"
-/yacronenv/bin/yacron -c /config/crontab.yml
+/speedtest2mqtt/bin/yacron -c /config/crontab.yml
