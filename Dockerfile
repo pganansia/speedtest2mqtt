@@ -30,8 +30,8 @@ RUN apk --no-cache add gcc musl-dev python3-dev
 RUN python3 -m venv speedtest2mqtt && \
     . speedtest2mqtt/bin/activate
 COPY requirements.txt .
-#RUN /speedtest2mqtt/bin/pip install --no-cache-dir -r requirements.txt
-RUN /speedtest2mqtt/bin/pip install yacron
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install yacron
 
 RUN echo "Target Arch $TARGETARCH" && \
     if test "$TARGETARCH" = '386'; then wget https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-i386.tgz -O /var/tmp/speedtest.tar.gz; fi && \
