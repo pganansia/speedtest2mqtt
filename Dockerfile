@@ -18,15 +18,14 @@ COPY --chmod=755 speedtest2mqtt.sh /app/config
 COPY crontab.yml /app/config
 COPY --chmod=755 entrypoint.sh /
 
-# Installation de tzdata, bash, client, mosquitto et qj 
-RUN apk --no-cache add tzdata bash mosquitto-clients jq
-# Pour test installation de wget 
-RUN apk --no-cache add wget
+# Installation de bash, jq, mosquitto-clients, tzdata et wget
+RUN apk --no-cache add bash jq mosquitto-clients tzdata wget 
 # Installation de python3 
 RUN apk --no-cache add python3
+# Installation des outils pour yacron 
+RUN apk --no-cache add gcc musl-dev python3-dev
 
 # Installation d'un environnement virtuel 
-RUN apk --no-cache add gcc musl-dev python3-dev
 RUN python3 -m venv speedtest2mqtt && \
     . speedtest2mqtt/bin/activate
 COPY requirements.txt .
