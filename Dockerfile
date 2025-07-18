@@ -30,6 +30,7 @@ RUN apk --no-cache add gcc musl-dev python3-dev
 RUN python3 -m venv speedtest2mqtt && \
     . speedtest2mqtt/bin/activate
 COPY requirements.txt .
+RUN speedtest2mqtt/pip install --upgrade pip
 RUN speedtest2mqtt/bin/pip install --no-cache-dir -r requirements.txt
 RUN speedtest2mqtt/bin/pip install yacron
 
