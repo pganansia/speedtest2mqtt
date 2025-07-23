@@ -1,0 +1,18 @@
+services:
+  speedtest2mqtt:
+    image: pganansia/speedtest2mqtt:latest
+    container_name: speedtest2mqtt
+    hostname: speedtest2mqtt
+    network_mode: host
+    environment:
+      - CRON=*/5 * * * *
+      - FILE_RESULT=/config/ookla.json
+      - MQTT_HOST=localhost
+      - MQTT_ID=speedtest2mqtt
+      - MQTT_TOPIC=speedtest
+      - MQTT_OPTIONS=-r
+      - MQTT_USER=user_mqqtt
+      - MQTT_PASS=password_mqtt
+    volumes:
+      - <path config directory on host>:/config
+    restart: unless-stopped

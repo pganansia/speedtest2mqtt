@@ -1,0 +1,105 @@
+name: CodeQL analysis
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Test Anchore Grype Vulnerability scan'
+        required: false
+        type: boolean
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
+
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    permissions:
+        actions: read
+        contents: read
+        deployments: write
+    name: Echo test
+    steps:
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3.4.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5.7.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Set DOCKERTAG
+        if: ${{ env.BRANCH_NAME != 'main' }}
+        shell: bash
+        run: echo "DOCKERTAG=$(echo "${{ env.BRANCH_NAME }}" | sed 's/refs-tags-v//')" >> $GITHUB_ENV
+      - name: Set BRANCH_NAME
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+      - name: Echo GITHUB_ENV
+        shell: bash
+        run: echo $GITHUB_ENV
+      - name: Echo BRANCH_NAME
+        shell: bash
+        run: echo ${{ env.BRANCH_NAME }}
+      - name: Echo GITHUB_REF
+        shell: bash
+        run: echo $GITHUB_REF
+      - name: Echo DOCKERTAG
+        shell: bash
+        run: echo $DOCKERTAG
+      - name: Cat GITHUB_ENV
+        shell: bash
+        run: echo $(cat ${GITHUB_ENV})
+
+  codeql-analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      attestations: write
+      checks: write
+      contents: write
+      deployments: write
+      id-token: write
+      issues: write
+      discussions: write
+      packages: write
+      pages: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
+    name: CodeQL analyze
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4.2.2
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3.28.10
+        with:
+          languages : actions
+      - name: Setup proxy for registries 
+        uses: github/codeql-action/start-proxy@v3.28.10
+      - name: Perform CodeQL analysis 
+        uses: github/codeql-action/analyze@v3.28.10
+        id: scan
+        with:
+          output: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results"
+#      - name: Upload Anchore Scan Report
+#        uses: github/codeql-action/upload-sarif@v3.28.10
+#        with:
+#          sarif_file: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results/actions.sarif"

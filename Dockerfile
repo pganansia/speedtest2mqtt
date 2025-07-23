@@ -1,7 +1,9 @@
 FROM alpine:3.22.1
+
 ARG TARGETARCH
 ARG DATE
 ARG VERSION
+ENV TZ=Europe/Paris
 ENV TZ=Europe/Paris
 LABEL org.opencontainers.image.authors="Pierre Ganansia"
 LABEL org.opencontainers.image.title="Speedtest2mqtt"
@@ -12,6 +14,28 @@ LABEL org.opencontainers.image.licenses="GPL-3.0"
 LABEL org.opencontainers.image.created=${DATE}
 LABEL org.opencontainers.image.version=${VERSION}
 
+RUN mkdir -p /app
+RUN mkdir -p /app/config
+COPY --chmod=755 speedtest2mqtt.sh /app/config
+COPY crontab.yml /app/config
+COPY --chmod=755 entrypoint.sh /
+
+# Installation de bash, jq, mosquitto-clients, tzdata et wget
+RUN apk --no-cache add bash jq mosquitto-clients tzdata wget 
+# Installation de python3 
+RUN apk --no-cache add python3
+# Installation des outils pour yacron 
+RUN apk --no-cache add gcc musl-dev python3-dev
+
+# Installation d'un environnement virtuel 
+RUN python3 -m venv speedtest2mqtt && \
+    . speedtest2mqtt/bin/activate
+COPY requirements.txt .
+RUN speedtest2mqtt/bin/pip install --upgrade pip
+RUN speedtest2mqtt/bin/pip install --no-cache-dir -r requirements.txt
+RUN speedtest2mqtt/bin/pip install yacron
+
+RUN echo "Target Arch $TARGETARCH" && \
 RUN mkdir -p /app
 RUN mkdir -p /app/config
 COPY --chmod=755 speedtest2mqtt.sh /app/config
