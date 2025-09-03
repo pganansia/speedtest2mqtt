@@ -23,7 +23,7 @@ jobs:
         security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
     steps:
       - name: Check out the code
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag localbuild/testimage:latest --build-arg TARGETARCH=amd64
       - name: Run the Anchore Grype scan action
@@ -88,7 +88,7 @@ jobs:
 
       # Check out du package
       - name: Checkout repository
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
       - name: Install cosign
