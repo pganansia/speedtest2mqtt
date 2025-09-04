@@ -52,12 +52,12 @@ jobs:
       - name: Echo GITHUB_ENV
         shell: bash
         run: echo $GITHUB_ENV
-      - name: Echo BRANCH_NAME
-        shell: bash
-        run: echo ${{ env.BRANCH_NAME }}
       - name: Echo GITHUB_REF
         shell: bash
         run: echo $GITHUB_REF
+      - name: Echo BRANCH_NAME
+        shell: bash
+        run: echo ${{ env.BRANCH_NAME }}
       - name: Echo DOCKERTAG
         shell: bash
         run: echo $DOCKERTAG
@@ -99,7 +99,7 @@ jobs:
         id: scan
         with:
           output: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results"
-#      - name: Upload Anchore Scan Report
-#        uses: github/codeql-action/upload-sarif@v3.28.10
-#        with:
-#          sarif_file: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results/actions.sarif"
+      - name: Upload Anchore Scan Report
+        uses: github/codeql-action/upload-sarif@v3.28.10
+        with:
+          sarif_file: "/home/runner/work/speedtest2mqtt/speedtest2mqtt/results/actions.sarif"

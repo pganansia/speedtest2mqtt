@@ -61,7 +61,6 @@ jobs:
         if: ${{ env.BRANCH_NAME != 'main' }}
         shell: bash
         run: echo "DOCKERTAG=$(echo "${{ env.BRANCH_NAME }}" | sed 's/refs-tags-v//')" >> $GITHUB_ENV
-
 #      - name: Debug branch-tag
 #        shell: bash
 #        run: echo $GITHUB_ENV
