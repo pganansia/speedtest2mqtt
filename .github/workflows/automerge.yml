@@ -1,4 +1,5 @@
 name: Automerge Pull Request
+
 permissions:
   contents: write
   pull-requests: write
