@@ -25,5 +25,5 @@ strictyaml==1.7.3
 typing-extensions==4.15.0
 urllib3==2.5.0
 yacron==0.19.0
-yarl==1.21.0
+yarl==1.22.0
 zipp==3.23.0
