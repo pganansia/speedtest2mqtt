@@ -19,7 +19,7 @@ MarkupSafe==3.0.3
 multidict==6.7.0
 python-dateutil==2.9.0.post0
 pytz==2025.2
-sentry-sdk==2.42.0
+sentry-sdk==2.42.1
 six==1.17.0
 strictyaml==1.7.3
 typing-extensions==4.15.0
