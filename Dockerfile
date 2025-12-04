@@ -22,7 +22,7 @@ COPY --chmod=755 entrypoint.sh /
 # Installation de bash, jq, mosquitto-clients, tzdata et wget
 RUN apk --no-cache add bash jq mosquitto-clients tzdata wget 
 # Installation de python3 
-RUN apk --no-cache add python3=3.15
+RUN apk --no-cache add python3
 # Installation des outils pour yacron 
 RUN apk --no-cache add gcc musl-dev python3-dev
 
