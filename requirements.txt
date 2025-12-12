@@ -23,7 +23,7 @@ sentry-sdk==2.47.0
 six==1.17.0
 strictyaml==1.7.3
 typing-extensions==4.15.0
-urllib3==2.6.1
+urllib3==2.6.2
 yacron==0.19.0
 yarl==1.22.0
 zipp==3.23.0
