@@ -18,8 +18,8 @@ Jinja2==3.1.6
 MarkupSafe==3.0.3
 multidict==6.7.1
 python-dateutil==2.9.0.post0
-pytz==2025.2
-sentry-sdk==2.54.0
+pytz==2026.1.post1
+sentry-sdk==2.50.0
 six==1.17.0
 strictyaml==1.7.3
 typing-extensions==4.15.0
