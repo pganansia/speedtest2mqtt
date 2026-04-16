@@ -7,7 +7,7 @@
 #ruamel.yaml==0.18.14
 #ruamel.yaml.clib==0.2.12
 ################################################################
-aiohttp==3.13.3
+aiohttp==3.13.4
 aiosmtplib==5.1.0
 async-timeout==5.0.1
 attrs==25.4.0
