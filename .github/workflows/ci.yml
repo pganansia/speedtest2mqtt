@@ -1,0 +1,85 @@
+name: CI
+
+# Vérifie chaque modification : qualité du code, construction de l'image
+# pour toutes les architectures et analyse de vulnérabilités.
+# Ne publie rien.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    # Analyse hebdomadaire : de nouvelles failles peuvent apparaître
+    # dans l'image de base sans modification du dépôt
+    - cron: '21 11 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: ShellCheck
+        run: shellcheck speedtest2mqtt.sh entrypoint.sh
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+
+  build-scan:
+    name: Build and scan
+    runs-on: ubuntu-latest
+    needs: lint
+    permissions:
+      contents: read
+      security-events: write # envoi du rapport SARIF
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4.0.0
+      # Construction de toutes les architectures publiées, pour détecter
+      # une erreur propre à l'une d'elles avant la publication
+      - name: Build all platforms
+        uses: docker/build-push-action@v7.1.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      # Image amd64 chargée localement pour l'analyse
+      - name: Build amd64 image for scan
+        uses: docker/build-push-action@v7.1.0
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: speedtest2mqtt:scan
+          cache-from: type=gha
+      - name: Grype vulnerability scan
+        id: scan
+        uses: anchore/scan-action@v7.4.0
+        with:
+          image: speedtest2mqtt:scan
+          fail-build: true
+          severity-cutoff: critical
+          only-fixed: true
+          output-format: sarif
+      - name: Upload vulnerability report
+        if: ${{ !cancelled() }}
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
