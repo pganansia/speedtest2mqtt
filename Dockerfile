@@ -41,6 +41,6 @@ COPY --chmod=755 entrypoint.sh /entrypoint.sh
 VOLUME ["/config"]
 
 # Le conteneur est sain tant que le planificateur tourne
-HEALTHCHECK --interval=5m --timeout=10s CMD ["pgrep", "crond"] > /dev/null || exit 1
+HEALTHCHECK --interval=5m --timeout=10s CMD ["pgrep", "crond"]
 
 ENTRYPOINT ["/entrypoint.sh"]
