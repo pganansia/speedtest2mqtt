@@ -78,6 +78,15 @@ jobs:
           severity-cutoff: critical
           only-fixed: true
           output-format: sarif
+      - name: Show vulnerabilities
+        if: failure() && steps.scan.outcome == 'failure'
+        uses: anchore/scan-action@v7.4.0
+        with:
+          image: speedtest2mqtt:scan
+          fail-build: false
+          severity-cutoff: critical
+          only-fixed: true
+          output-format: table
       - name: Upload vulnerability report
         if: ${{ !cancelled() }}
         uses: github/codeql-action/upload-sarif@v4
