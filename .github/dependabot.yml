@@ -1,14 +1,15 @@
 version: 2
 updates:
+  # Actions GitHub utilisées par les workflows
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns: ["*"]
+  # Image de base Alpine
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "daily"
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "daily"
+      interval: "weekly"
