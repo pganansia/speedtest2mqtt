@@ -18,18 +18,7 @@ LABEL org.opencontainers.image.authors="Pierre Ganansia" \
       org.opencontainers.image.licenses="GPL-3.0"
 
 # hadolint ignore=DL3018
-RUN apk add --no-cache bash jq mosquitto-clients tzdata python3
-
-# Environnement Python de yacron : les outils de compilation ne servent
-# qu'à l'installation et sont retirés dans la même couche
-COPY requirements.txt /tmp/requirements.txt
-# hadolint ignore=DL3018,DL3013
-RUN apk add --no-cache --virtual .build-deps gcc musl-dev python3-dev \
-    && python3 -m venv /speedtest2mqtt \
-    && /speedtest2mqtt/bin/pip install --no-cache-dir --upgrade pip \
-    && /speedtest2mqtt/bin/pip install --no-cache-dir -r /tmp/requirements.txt \
-    && apk del .build-deps \
-    && rm /tmp/requirements.txt
+RUN apk add --no-cache bash jq mosquitto-clients tzdata
 
 # Client Ookla Speedtest selon l'architecture
 # (linux/arm/v6 -> armel, linux/arm/v7 -> armhf)
@@ -46,13 +35,12 @@ RUN case "${TARGETARCH}${TARGETVARIANT:+/${TARGETVARIANT}}" in \
     && rm /tmp/speedtest.tgz \
     && speedtest --version
 
-COPY --chmod=755 speedtest2mqtt.sh /app/config/speedtest2mqtt.sh
-COPY crontab.yml /app/config/crontab.yml
+COPY --chmod=755 speedtest2mqtt.sh /app/speedtest2mqtt.sh
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
 VOLUME ["/config"]
 
 # Le conteneur est sain tant que le planificateur tourne
-HEALTHCHECK --interval=5m --timeout=10s CMD pgrep -f yacron > /dev/null || exit 1
+HEALTHCHECK --interval=5m --timeout=10s CMD pgrep crond > /dev/null || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
