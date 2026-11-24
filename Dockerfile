@@ -17,8 +17,11 @@ LABEL org.opencontainers.image.authors="Pierre Ganansia" \
       org.opencontainers.image.source="https://github.com/pganansia/speedtest2mqtt" \
       org.opencontainers.image.licenses="GPL-3.0"
 
-# hadolint ignore=DL3018
-RUN apk add --no-cache bash jq mosquitto-clients tzdata
+# Mise à jour des paquets de l'image de base : intègre les correctifs de
+# sécurité publiés par Alpine depuis la création de l'étiquette alpine:3.24.x
+# hadolint ignore=DL3017,DL3018
+RUN apk upgrade --no-cache \
+    && apk add --no-cache bash jq mosquitto-clients tzdata
 
 # Client Ookla Speedtest selon l'architecture
 # (linux/arm/v6 -> armel, linux/arm/v7 -> armhf)
