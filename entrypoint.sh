@@ -1,7 +1,7 @@
 #!/bin/bash
 ##################################################################
-# Point d'entrée du conteneur : prépare la planification yacron
-# puis la lance.
+# Point d'entrée du conteneur : prépare la planification et lance
+# crond (BusyBox, fourni par Alpine).
 ##################################################################
 set -e
 
@@ -10,14 +10,13 @@ set -e
 # les 5 minutes (288 par jour) déclenche l'erreur « Limit reached ».
 CRON="${CRON:-17 */3 * * *}"
 
-APP_DIR=/app/config
+SCRIPT=/app/speedtest2mqtt.sh
 RUN_DIR=/run/speedtest2mqtt
-mkdir -p "${RUN_DIR}" /config
+ENV_FILE="${RUN_DIR}/container.env"
+mkdir -p "${RUN_DIR}" /config /etc/crontabs
 
 ##################################################################
-# Ancienne version : le script était copié dans /config et cette
-# copie n'était jamais mise à jour. Le script de l'image est
-# désormais toujours utilisé.
+# Anciennes versions : fichiers copiés dans /config, plus utilisés
 ##################################################################
 if [[ -f /config/speedtest2mqtt.sh || -f /config/crontab.yml || -f /config/container.env ]]; then
     echo "Old files found in /config (speedtest2mqtt.sh, crontab.yml, container.env):"
@@ -25,18 +24,23 @@ if [[ -f /config/speedtest2mqtt.sh || -f /config/crontab.yml || -f /config/conta
 fi
 
 ##################################################################
-# Variables transmises au script : uniquement celles qui le
-# concernent, dans un fichier lisible par root seulement et non
-# persistant (pas dans le volume /config).
+# crond ne transmet pas les variables du conteneur aux tâches :
+# elles sont écrites dans un fichier lu avant chaque test.
+# Uniquement les variables utiles, valeurs protégées par des
+# apostrophes, fichier lisible par root seulement, hors du volume.
 ##################################################################
 umask 077
-env | grep -E '^(TZ|FILE_RESULT|MQTT_[A-Z_]+|RANDOM_DELAY|SPEEDTEST_[A-Z_]+)=' > "${RUN_DIR}/container.env" || true
+: > "${ENV_FILE}"
+while IFS='=' read -r name _; do
+    value="${!name}"
+    printf "export %s='%s'\n" "${name}" "${value//\'/\'\\\'\'}" >> "${ENV_FILE}"
+done < <(env | grep -E '^(TZ|FILE_RESULT|MQTT_[A-Z_]+|RANDOM_DELAY|SPEEDTEST_[A-Z_]+)=')
 
 ##################################################################
-# Planification
+# Planification : la sortie du test est envoyée vers le journal
+# du conteneur (docker logs)
 ##################################################################
-sed "s|__SCHEDULE__|${CRON}|; s|__SCRIPT__|${APP_DIR}/speedtest2mqtt.sh|; s|__ENV_FILE__|${RUN_DIR}/container.env|" \
-    "${APP_DIR}/crontab.yml" > "${RUN_DIR}/crontab.yml"
+echo "${CRON} . ${ENV_FILE} && ${SCRIPT} > /proc/1/fd/1 2>&1" > /etc/crontabs/root
 
 echo "starting cron (${CRON})"
-exec /speedtest2mqtt/bin/yacron -c "${RUN_DIR}/crontab.yml"
+exec crond -f -d 8
