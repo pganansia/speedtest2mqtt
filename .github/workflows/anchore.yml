@@ -45,13 +45,13 @@ jobs:
     steps:
     - name: Check out the code
       id: check
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
     - name: Build the Docker image
       id: build
       run: docker build . --file Dockerfile --tag localbuild/testimage:latest
     - name: Run the Anchore Grype scan action
       id: scan
-      uses: anchore/scan-action@v7.4.0
+      uses: anchore/scan-action@v7.4.2
       with:
         image: "localbuild/testimage:latest"
         fail-build: false
