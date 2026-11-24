@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM alpine:3.23.4
+FROM alpine:3.24.1
 
 # Fournis automatiquement par Buildx pour chaque plateforme
 ARG TARGETARCH
