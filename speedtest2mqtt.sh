@@ -1,118 +1,159 @@
 #!/bin/bash
-#############################################
-# Test et valeur par défault des variables
-# d'environnement.
-#############################################
-FILE_RESULT=${FILE_RESULT:-/config/ookla.json}
-MQTT_HOST=${MQTT_HOST:-localhost}
-MQTT_ID=${MQTT_ID:-speedtest2mqtt}
-MQTT_TOPIC=${MQTT_TOPIC:-speedtest}
-MQTT_OPTIONS=${MQTT_OPTIONS:-"-r"}
-MQTT_USER=${MQTT_USER:-user}
-MQTT_PASS=${MQTT_PASS:-pass}
-TIMESTAMP=$(date -Iseconds)
+##################################################################
+# speedtest2mqtt : lance un test Ookla Speedtest et publie les
+# résultats sur un broker MQTT.
+##################################################################
+set -o pipefail
 
-#############################################
-# Lancement du traitement.
-#############################################
-echo "${TIMESTAMP} Starting speedtest"
-echo "${TIMESTAMP} Result file: ${FILE_RESULT}"
+##################################################################
+# Variables d'environnement et valeurs par défaut
+##################################################################
+FILE_RESULT="${FILE_RESULT:-/config/ookla.json}"
+MQTT_HOST="${MQTT_HOST:-localhost}"
+MQTT_PORT="${MQTT_PORT:-1883}"
+MQTT_ID="${MQTT_ID:-speedtest2mqtt}"
+MQTT_TOPIC="${MQTT_TOPIC:-speedtest}"
+MQTT_OPTIONS="${MQTT_OPTIONS:--r}"
+MQTT_USER="${MQTT_USER:-}"
+MQTT_PASS="${MQTT_PASS:-}"
+# Délai aléatoire maximal (secondes) avant le test : évite que tous les
+# utilisateurs interrogent les serveurs Ookla à la même seconde
+RANDOM_DELAY="${RANDOM_DELAY:-60}"
+# Identifiant de serveur Ookla imposé (vide = choix automatique)
+SPEEDTEST_SERVER_ID="${SPEEDTEST_SERVER_ID:-}"
+TIMESTAMP="$(date -Iseconds)"
 
-#############################################
-# Lancement de speedtest.
-#############################################
-speedtest --accept-license --accept-gdpr -f json-pretty > ${FILE_RESULT}
+log() {
+    echo "$(date -Iseconds) $*"
+}
 
-#############################################
-# Récupération des résultats.
-#############################################
-echo "${TIMESTAMP} Speedtest results"
+##################################################################
+# Publication MQTT d'une valeur : publish <sous-topic> <valeur>
+##################################################################
+publish() {
+    local args=(-h "${MQTT_HOST}" -p "${MQTT_PORT}" -i "${MQTT_ID}" -t "${MQTT_TOPIC}/$1" -m "$2")
+    [[ -n "${MQTT_USER}" ]] && args+=(-u "${MQTT_USER}")
+    [[ -n "${MQTT_PASS}" ]] && args+=(-P "${MQTT_PASS}")
+    # MQTT_OPTIONS est volontairement découpé en plusieurs options (ex. "-r -q 1")
+    # shellcheck disable=SC2206
+    args+=(${MQTT_OPTIONS})
+    if ! /usr/bin/mosquitto_pub "${args[@]}"; then
+        log "MQTT publish failed for topic ${MQTT_TOPIC}/$1"
+        return 1
+    fi
+}
 
-#############################################
-# Test d'un resultat en erreur.
-#############################################
-strerror=$(jq -r '.error' ${FILE_RESULT})
-if [[ ${strerror} != "null" ]]; then
-    echo "${TIMESTAMP} Process error       = ${strerror}"
-    echo "${TIMESTAMP} Ending speedtest"
-    exit 1
-else
-    strerror="No error"
-    echo "${TIMESTAMP} Process error       = ${strerror}"
+log "Starting speedtest"
+log "Result file: ${FILE_RESULT}"
+
+##################################################################
+# Délai aléatoire
+##################################################################
+if [[ "${RANDOM_DELAY}" =~ ^[0-9]+$ ]] && (( RANDOM_DELAY > 0 )); then
+    delay=$(( RANDOM % (RANDOM_DELAY + 1) ))
+    log "Waiting ${delay} s before running the test"
+    sleep "${delay}"
 fi
 
-#############################################
-# Recuperation des resultats.
-#############################################
-timestamp=$(jq -r '.timestamp' ${FILE_RESULT})
-jitter=$(jq -r '.ping.jitter' ${FILE_RESULT})
-ping=$(jq -r '.ping.latency' ${FILE_RESULT})
-download=$(printf %.2f\\n "$(($(jq -r '.download.bandwidth' ${FILE_RESULT}) * 8))e-6")
-upload=$(printf %.2f\\n "$(($(jq -r '.upload.bandwidth' ${FILE_RESULT}) * 8))e-6")
-isp=$(jq -r '.isp' ${FILE_RESULT})
-interfaceinternalip=$(jq -r '.interface.internalIp' ${FILE_RESULT})
-interfacename=$(jq -r '.interface.name' ${FILE_RESULT})
-interfacemacaddr=$(jq -r '.interface.macAddr' ${FILE_RESULT})
-interfaceisvpn=$(jq -r '.interface.isVpn' ${FILE_RESULT})
-interfaceexternalip=$(jq -r '.interface.externalIp' ${FILE_RESULT})
-servername=$(jq -r '.server.name' ${FILE_RESULT})
-servercountry=$(jq -r '.server.country' ${FILE_RESULT})
-serverlocation=$(jq -r '.server.location' ${FILE_RESULT})
-serverhost=$(jq -r '.server.host' ${FILE_RESULT})
-serverport=$(jq -r '.server.port' ${FILE_RESULT})
-serverip=$(jq -r '.server.ip' ${FILE_RESULT})
-resultid=$(jq -r '.result.id' ${FILE_RESULT})
-resulturl=$(jq -r '.result.url' ${FILE_RESULT})
+##################################################################
+# Lancement de speedtest
+# Le résultat est écrit dans un fichier temporaire : le fichier final
+# n'est remplacé que si le test a réussi.
+##################################################################
+tmp_result="$(mktemp)"
+tmp_error="$(mktemp)"
+trap 'rm -f "${tmp_result}" "${tmp_error}"' EXIT
 
-#############################################
-# Affichage des resultats.
-#############################################
-echo "${TIMESTAMP} timestamp           = ${timestamp}"
-echo "${TIMESTAMP} jitter              = ${jitter} ms"
-echo "${TIMESTAMP} ping                = ${ping} ms"
-echo "${TIMESTAMP} download            = ${download} Mbps"
-echo "${TIMESTAMP} upload              = ${upload} Mbps"
-echo "${TIMESTAMP} isp                 = ${isp}"
-echo "${TIMESTAMP} interfaceinternalip = ${interfaceinternalip}"
-echo "${TIMESTAMP} interfacename       = ${interfacename}"
-echo "${TIMESTAMP} interfacemacaddr    = ${interfacemacaddr}"
-echo "${TIMESTAMP} interfaceisvpn      = ${interfaceisvpn}"
-echo "${TIMESTAMP} interfaceexternalip = ${interfaceexternalip}"
-echo "${TIMESTAMP} servername          = ${servername}"
-echo "${TIMESTAMP} serverlocation      = ${serverlocation}"
-echo "${TIMESTAMP} servercountry       = ${servercountry}"
-echo "${TIMESTAMP} serverhost          = ${serverhost}"
-echo "${TIMESTAMP} serverport          = ${serverport}"
-echo "${TIMESTAMP} serverip            = ${serverip}"
-echo "${TIMESTAMP} resultid            = ${resultid}"
-echo "${TIMESTAMP} resulturl           = ${resulturl}"
-echo "${TIMESTAMP} sending results to ${MQTT_HOST} as clientID ${MQTT_ID} with options ${MQTT_OPTIONS} using user ${MQTT_USER}"
+speedtest_args=(--accept-license --accept-gdpr -f json-pretty)
+[[ -n "${SPEEDTEST_SERVER_ID}" ]] && speedtest_args+=(--server-id="${SPEEDTEST_SERVER_ID}")
 
-#############################################
-# Envoi des valeurs vers MQTT.
-#############################################
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/timestamp -m "${timestamp}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/jitter -m "${jitter}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/ping -m "${ping}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/download -m "${download}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/upload -m "${upload}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/isp -m "${isp}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/interface/internalip -m "${interfaceinternalip}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/interface/name -m "${interfacename}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/interface/macaddr -m "${interfacemacaddr}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/interface/isvpn -m "${interfaceisvpn}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/interface/externalip -m "${interfaceexternalip}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/server/name -m "${servername}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/server/location -m "${serverlocation}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/server/country -m "${servercountry}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/server/host -m "${serverhost}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/server/port -m "${serverport}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/server/ip -m "${serverip}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/result/id -m "${resultid}"
-/usr/bin/mosquitto_pub -h ${MQTT_HOST} -i ${MQTT_ID} ${MQTT_OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS} -t ${MQTT_TOPIC}/result/url -m "${resulturl}"
+speedtest "${speedtest_args[@]}" > "${tmp_result}" 2> "${tmp_error}"
+rc=$?
 
-#############################################
-# Ending Speedtest.
-#############################################
-echo "${TIMESTAMP} Ending speedtest"
-exit 0
+##################################################################
+# Gestion des erreurs : code retour, message sur stderr, ou champ
+# « error » dans le JSON
+##################################################################
+json_error="$(jq -r '.error // empty' "${tmp_result}" 2>/dev/null)"
+if (( rc != 0 )) || [[ -n "${json_error}" ]] || ! jq -e '.download.bandwidth' "${tmp_result}" > /dev/null 2>&1; then
+    message="${json_error:-$(grep -v '^[[:space:]]*$' "${tmp_error}" | tail -n 1)}"
+    message="${message:-speedtest exit code ${rc}}"
+    log "Process error       = ${message}"
+    publish status "error"
+    publish error "${message}"
+    log "Ending speedtest"
+    exit 1
+fi
+log "Process error       = No error"
+mv "${tmp_result}" "${FILE_RESULT}"
+
+##################################################################
+# Récupération des résultats
+##################################################################
+j() { jq -r "$1" "${FILE_RESULT}"; }
+timestamp="$(j '.timestamp')"
+jitter="$(j '.ping.jitter')"
+ping="$(j '.ping.latency')"
+# bande passante en octets/s -> Mbit/s
+download="$(j '(.download.bandwidth * 8 / 1000000 * 100 | round) / 100')"
+upload="$(j '(.upload.bandwidth * 8 / 1000000 * 100 | round) / 100')"
+isp="$(j '.isp')"
+interfaceinternalip="$(j '.interface.internalIp')"
+interfacename="$(j '.interface.name')"
+interfacemacaddr="$(j '.interface.macAddr')"
+interfaceisvpn="$(j '.interface.isVpn')"
+interfaceexternalip="$(j '.interface.externalIp')"
+servername="$(j '.server.name')"
+servercountry="$(j '.server.country')"
+serverlocation="$(j '.server.location')"
+serverhost="$(j '.server.host')"
+serverport="$(j '.server.port')"
+serverip="$(j '.server.ip')"
+resultid="$(j '.result.id')"
+resulturl="$(j '.result.url')"
+
+##################################################################
+# Affichage des résultats
+##################################################################
+log "timestamp           = ${timestamp}"
+log "jitter              = ${jitter} ms"
+log "ping                = ${ping} ms"
+log "download            = ${download} Mbps"
+log "upload              = ${upload} Mbps"
+log "isp                 = ${isp}"
+log "interfacename       = ${interfacename}"
+log "servername          = ${servername}"
+log "serverlocation      = ${serverlocation}"
+log "resulturl           = ${resulturl}"
+log "sending results to ${MQTT_HOST}:${MQTT_PORT} as clientID ${MQTT_ID} with options ${MQTT_OPTIONS}"
+
+##################################################################
+# Envoi des valeurs vers MQTT (mêmes topics que les versions
+# précédentes, plus status, error et last_run)
+##################################################################
+failed=0
+publish timestamp "${timestamp}" || failed=1
+publish jitter "${jitter}" || failed=1
+publish ping "${ping}" || failed=1
+publish download "${download}" || failed=1
+publish upload "${upload}" || failed=1
+publish isp "${isp}" || failed=1
+publish interface/internalip "${interfaceinternalip}" || failed=1
+publish interface/name "${interfacename}" || failed=1
+publish interface/macaddr "${interfacemacaddr}" || failed=1
+publish interface/isvpn "${interfaceisvpn}" || failed=1
+publish interface/externalip "${interfaceexternalip}" || failed=1
+publish server/name "${servername}" || failed=1
+publish server/location "${serverlocation}" || failed=1
+publish server/country "${servercountry}" || failed=1
+publish server/host "${serverhost}" || failed=1
+publish server/port "${serverport}" || failed=1
+publish server/ip "${serverip}" || failed=1
+publish result/id "${resultid}" || failed=1
+publish result/url "${resulturl}" || failed=1
+publish status "ok" || failed=1
+publish error "" || failed=1
+publish last_run "${TIMESTAMP}" || failed=1
+
+log "Ending speedtest"
+exit "${failed}"

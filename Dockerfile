@@ -1,49 +1,58 @@
+# syntax=docker/dockerfile:1
 FROM alpine:3.23.4
 
+# Fournis automatiquement par Buildx pour chaque plateforme
 ARG TARGETARCH
-ARG DATE
-ARG VERSION
+ARG TARGETVARIANT
+# Version du client Ookla Speedtest
+ARG OOKLA_VERSION=1.2.0
+
 ENV TZ=Europe/Paris
-LABEL org.opencontainers.image.authors="Pierre Ganansia"
-LABEL org.opencontainers.image.title="Speedtest2mqtt"
-LABEL org.opencontainers.image.description="Speedtest trough MQTT for Home Assistant. Thanks to moafrancky"
-LABEL org.opencontainers.image.url="https://github.com/pganansia/speedtest2mqtt"
-LABEL org.opencontainers.image.source="https://github.com/pganansia/speedtest2mqtt"
-LABEL org.opencontainers.image.licenses="GPL-3.0"
-LABEL org.opencontainers.image.created=${DATE}
-LABEL org.opencontainers.image.version=${VERSION}
 
-RUN mkdir -p /app
-RUN mkdir -p /app/config
-COPY --chmod=755 speedtest2mqtt.sh /app/config
-COPY crontab.yml /app/config
-COPY --chmod=755 entrypoint.sh /
+# Les labels de version et de date sont ajoutés par docker/metadata-action
+LABEL org.opencontainers.image.authors="Pierre Ganansia" \
+      org.opencontainers.image.title="Speedtest2mqtt" \
+      org.opencontainers.image.description="Speedtest trough MQTT for Home Assistant. Thanks to moafrancky" \
+      org.opencontainers.image.url="https://github.com/pganansia/speedtest2mqtt" \
+      org.opencontainers.image.source="https://github.com/pganansia/speedtest2mqtt" \
+      org.opencontainers.image.licenses="GPL-3.0"
 
-# Installation de bash, jq, mosquitto-clients, tzdata et wget
-RUN apk --no-cache add bash jq mosquitto-clients tzdata wget 
-# Installation de python3 
-RUN apk --no-cache add python3
-# Installation des outils pour yacron 
-RUN apk --no-cache add gcc musl-dev python3-dev
+# hadolint ignore=DL3018
+RUN apk add --no-cache bash jq mosquitto-clients tzdata python3
 
-# Installation d'un environnement virtuel 
-RUN python3 -m venv speedtest2mqtt && \
-    . speedtest2mqtt/bin/activate
-COPY requirements.txt .
-RUN speedtest2mqtt/bin/pip install --upgrade pip
-RUN speedtest2mqtt/bin/pip install --no-cache-dir -r requirements.txt
-RUN speedtest2mqtt/bin/pip install yacron
+# Environnement Python de yacron : les outils de compilation ne servent
+# qu'à l'installation et sont retirés dans la même couche
+COPY requirements.txt /tmp/requirements.txt
+# hadolint ignore=DL3018,DL3013
+RUN apk add --no-cache --virtual .build-deps gcc musl-dev python3-dev \
+    && python3 -m venv /speedtest2mqtt \
+    && /speedtest2mqtt/bin/pip install --no-cache-dir --upgrade pip \
+    && /speedtest2mqtt/bin/pip install --no-cache-dir -r /tmp/requirements.txt \
+    && apk del .build-deps \
+    && rm /tmp/requirements.txt
 
-RUN echo "Target Arch $TARGETARCH" && \
-    if test "$TARGETARCH" = '386'; then wget https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-i386.tgz -O /var/tmp/speedtest.tar.gz; fi && \
-    if test "$TARGETARCH" = 'amd64'; then wget https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-x86_64.tgz -O /var/tmp/speedtest.tar.gz; fi && \
-    if test "$TARGETARCH" = 'arm'; then wget https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-armhf.tgz -O /var/tmp/speedtest.tar.gz; fi && \
-    if test "$TARGETARCH" = 'arm64'; then wget https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-aarch64.tgz -O /var/tmp/speedtest.tar.gz; fi && \
-    if test "$TARGETARCH" = 'arm/v6'; then wget https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-armel.tgz -O /var/tmp/speedtest.tar.gz; fi && \
-    tar xf /var/tmp/speedtest.tar.gz -C /var/tmp && \
-    mv /var/tmp/speedtest /usr/local/bin && \
-    rm /var/tmp/speedtest.tar.gz
+# Client Ookla Speedtest selon l'architecture
+# (linux/arm/v6 -> armel, linux/arm/v7 -> armhf)
+RUN case "${TARGETARCH}${TARGETVARIANT:+/${TARGETVARIANT}}" in \
+        amd64)  OOKLA_ARCH=x86_64 ;; \
+        386)    OOKLA_ARCH=i386 ;; \
+        arm64)  OOKLA_ARCH=aarch64 ;; \
+        arm/v7) OOKLA_ARCH=armhf ;; \
+        arm/v6) OOKLA_ARCH=armel ;; \
+        *) echo "Unsupported architecture: ${TARGETARCH}${TARGETVARIANT:+/${TARGETVARIANT}}" && exit 1 ;; \
+    esac \
+    && wget -q "https://install.speedtest.net/app/cli/ookla-speedtest-${OOKLA_VERSION}-linux-${OOKLA_ARCH}.tgz" -O /tmp/speedtest.tgz \
+    && tar xzf /tmp/speedtest.tgz -C /usr/local/bin speedtest \
+    && rm /tmp/speedtest.tgz \
+    && speedtest --version
+
+COPY --chmod=755 speedtest2mqtt.sh /app/config/speedtest2mqtt.sh
+COPY crontab.yml /app/config/crontab.yml
+COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
 VOLUME ["/config"]
+
+# Le conteneur est sain tant que le planificateur tourne
+HEALTHCHECK --interval=5m --timeout=10s CMD pgrep -f yacron > /dev/null || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
