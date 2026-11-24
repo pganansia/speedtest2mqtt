@@ -1,9 +1,10 @@
+# Modèle : les valeurs __...__ sont remplacées au démarrage par entrypoint.sh
 jobs:
   - name: speedtest
-    command: /config/speedtest2mqtt.sh
+    command: __SCRIPT__
     shell: /bin/bash
-    schedule: "*/5 * * * *"
-    env_file: /config/container.env
-    captureStderr: false
+    schedule: "__SCHEDULE__"
+    env_file: __ENV_FILE__
+    captureStderr: true
     captureStdout: true
     concurrencyPolicy: Forbid
